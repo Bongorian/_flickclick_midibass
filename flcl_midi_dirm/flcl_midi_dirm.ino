@@ -79,12 +79,12 @@ void setup()
   //led init
   strip.begin();
   strip.show();
-  rainbowCycle(20);
+  rainbowCycle(1200);
+  delay(1000);
   strip.setPixelColor(0, strip.Color(0, 0, 0));
   strip.setPixelColor(1, strip.Color(0, 0, 0));
   strip.setPixelColor(2, strip.Color(0, 0, 0));
   strip.setPixelColor(3, strip.Color(0, 0, 0));
-  delay(1000);
 }
 
 void rainbowCycle(uint8_t wait)
@@ -98,7 +98,7 @@ void rainbowCycle(uint8_t wait)
       strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
     }
     strip.show();
-    delay(wait);
+    delayMicroseconds(wait);
   }
 }
 
@@ -137,11 +137,33 @@ void checkFlick()
   sub2 = analogRead(JOY4B);
   if (vertical < 500)
   {
-    setMode(UP);
+    if (holizonal > 4000)
+    {
+      setMode(UPLEFT);
+    }
+    else if (holizonal < 500)
+    {
+      setMode(UPRIGHT);
+    }
+    else
+    {
+      setMode(UP);
+    }
   }
   else if (vertical > 4000)
   {
-    setMode(DOWN);
+    if (holizonal > 4000)
+    {
+      setMode(DOWNLEFT);
+    }
+    else if (holizonal < 500)
+    {
+      setMode(DOWNRIGHT);
+    }
+    else
+    {
+      setMode(DOWN);
+    }
   }
   else if (holizonal > 4000)
   {
