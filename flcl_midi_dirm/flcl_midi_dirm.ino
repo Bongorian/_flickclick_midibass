@@ -1,4 +1,4 @@
-#include <USBComposite.h>
+// #include <USBComposite.h>
 #include <WS2812B.h>
 
 char *manufacture = "bongorian";
@@ -50,7 +50,7 @@ unsigned int vertical, holizonal, sub1, sub2; //方向,ねじりの検出
 byte switches[2] = {0, 0};
 
 //instances
-USBMIDI midi;
+// USBMIDI midi;
 WS2812B strip = WS2812B(NUM_LEDS);
 
 void setup()
@@ -72,10 +72,10 @@ void setup()
   pinMode(MODE1, INPUT);
   pinMode(MODE2, INPUT);
   //midi init
-  USBComposite.setProductId(0x0075);
-  USBComposite.setManufacturerString(manufacture);
-  USBComposite.setProductString(product);
-  midi.begin();
+  // USBComposite.setProductId(0x0075);
+  // USBComposite.setManufacturerString(manufacture);
+  // USBComposite.setProductString(product);
+  // midi.begin();
   //led init
   strip.begin();
   strip.show();
@@ -139,54 +139,54 @@ void checkFlick()
   {
     if (holizonal > 4000)
     {
-      setMode(UPLEFT);
+      setFlick(UPLEFT);
     }
     else if (holizonal < 500)
     {
-      setMode(UPRIGHT);
+      setFlick(UPRIGHT);
     }
     else
     {
-      setMode(UP);
+      setFlick(UP);
     }
   }
   else if (vertical > 4000)
   {
     if (holizonal > 4000)
     {
-      setMode(DOWNLEFT);
+      setFlick(DOWNLEFT);
     }
     else if (holizonal < 500)
     {
-      setMode(DOWNRIGHT);
+      setFlick(DOWNRIGHT);
     }
     else
     {
-      setMode(DOWN);
+      setFlick(DOWN);
     }
   }
   else if (holizonal > 4000)
   {
-    setMode(LEFT);
+    setFlick(LEFT);
   }
   else if (holizonal < 500)
   {
-    setMode(RIGHT);
+    setFlick(RIGHT);
   }
   else
   {
-    setMode(MU);
+    setFlick(MU);
   }
 }
 
-void setMode(byte status)
+void setFlick(byte status)
 {
   oldmode = curmode;
   curmode = status;
   setLed(curmode);
 }
 
-bool checkModechange()
+bool checkFlickchange()
 {
   if (oldmode == curmode)
   {
@@ -318,14 +318,14 @@ void isFletactive(int shift)
     {
       if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] == 0))
       {
-        midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift, 127);
+        // midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift, 127);
       }
       else if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] != 0))
       {
       }
       else
       {
-        midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift, 127);
+        // midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift, 127);
       }
     }
   }
@@ -343,7 +343,7 @@ void AlloldNoteOff(byte mode)
     {
       for (int colIndex = 0; colIndex < colCount; colIndex++)
       {
-        midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
+        // midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
       }
     }
 }
@@ -352,7 +352,7 @@ void loop()
 {
   checkFlick();
   readMatrix();
-  if (checkModechange())
+  if (checkFlickchange())
   {
     AlloldNoteOff(oldmode);
   }
