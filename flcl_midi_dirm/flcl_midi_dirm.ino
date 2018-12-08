@@ -1,4 +1,4 @@
-// #include <USBComposite.h>
+#include <USBComposite.h>
 #include <WS2812B.h>
 
 char *manufacture = "bongorian";
@@ -47,15 +47,16 @@ const int numNotes = sizeof(notes) / sizeof(*notes);
 byte curmode;
 byte oldmode;
 unsigned int vertical, holizonal, sub1, sub2; //方向,ねじりの検出
-byte switches[2] = {0, 0};
-
+byte curswitches[2] = {0, 0};
+byte oldswitches[2] = {0, 0};
 //instances
-// USBMIDI midi;
+USBMIDI midi;
 WS2812B strip = WS2812B(NUM_LEDS);
 
 void setup()
 {
   Serial.begin(115200);
+  Serial1.begin(115200);
   for (int x = 0; x < rowCount; x++)
   {
     pinMode(rows[x], OUTPUT);
@@ -72,19 +73,19 @@ void setup()
   pinMode(MODE1, INPUT);
   pinMode(MODE2, INPUT);
   //midi init
-  // USBComposite.setProductId(0x0075);
-  // USBComposite.setManufacturerString(manufacture);
-  // USBComposite.setProductString(product);
-  // midi.begin();
+  USBComposite.setProductId(0x0075);
+  USBComposite.setManufacturerString(manufacture);
+  USBComposite.setProductString(product);
+  midi.begin();
   //led init
   strip.begin();
   strip.show();
-  rainbowCycle(1200);
-  delay(1000);
+  rainbowCycle(10);
   strip.setPixelColor(0, strip.Color(0, 0, 0));
   strip.setPixelColor(1, strip.Color(0, 0, 0));
   strip.setPixelColor(2, strip.Color(0, 0, 0));
   strip.setPixelColor(3, strip.Color(0, 0, 0));
+  delay(1000);
 }
 
 void rainbowCycle(uint8_t wait)
@@ -98,7 +99,7 @@ void rainbowCycle(uint8_t wait)
       strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
     }
     strip.show();
-    delayMicroseconds(wait);
+    delay(wait);
   }
 }
 
@@ -125,8 +126,10 @@ uint32_t Wheel(byte WheelPos)
 
 void checkSwitch()
 {
-  switches[0] = digitalRead(MODE1);
-  switches[1] = digitalRead(MODE2);
+  oldswitches[0] = curswitches[0];
+  oldswitches[1] = curswitches[1];
+  curswitches[0] = digitalRead(MODE1);
+  curswitches[1] = digitalRead(MODE2);
 }
 
 void checkFlick()
@@ -212,6 +215,9 @@ void setLed(byte mode)
   {
   case MU:
     strip.setPixelColor(0, strip.Color(0, 0, 0));
+    strip.setPixelColor(1, strip.Color(0, 0, 0));
+    strip.setPixelColor(2, strip.Color(0, 0, 0));
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
     break;
   case UP:
@@ -252,10 +258,14 @@ void setLed(byte mode)
     break;
   case LEFTRORTATE:
     strip.setPixelColor(0, strip.Color(0, 150, 0));
+    strip.setPixelColor(0, strip.Color(1, 150, 0));
+    strip.setPixelColor(0, strip.Color(2, 150, 0));
     strip.show();
     break;
   case RIGHTRORTATE:
     strip.setPixelColor(0, strip.Color(0, 150, 0));
+    strip.setPixelColor(0, strip.Color(1, 150, 0));
+    strip.setPixelColor(0, strip.Color(2, 150, 0));
     strip.show();
     break;
   }
@@ -316,7 +326,11 @@ void setNote(byte mode)
     isFletactive(shift);
     break;
   case UP:
+    isFletactive(shift + 12);
+    break;
   case DOWN:
+    isFletactive(shift - 12);
+    break;
   case MU:
     isFletactive(0);
   }
@@ -330,14 +344,14 @@ void isFletactive(int shift)
     {
       if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] == 0))
       {
-        // midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift, 127);
+        midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift, 127);
       }
       else if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] != 0))
       {
       }
       else
       {
-        // midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift, 127);
+        midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift, 127);
       }
     }
   }
@@ -350,12 +364,28 @@ void AlloldNoteOff(byte mode)
   {
     oldshift = 0;
   }
+  if (mode == UP)
+  {
+    oldshift = 12;
+  }
+  if (mode == DOWN)
+  {
+    oldshift = -12;
+  }
+  if (mode == UPLEFT)
+  {
+    oldshift = 8;
+  }
+  if (mode == UP)
+  {
+    oldshift = 8;
+  }
   else if (mode)
     for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
     {
       for (int colIndex = 0; colIndex < colCount; colIndex++)
       {
-        // midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
+        midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
       }
     }
 }
