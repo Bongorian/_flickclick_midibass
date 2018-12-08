@@ -357,4 +357,12 @@ void loop()
     AlloldNoteOff(oldmode);
   }
   setNote(curmode);
+  Serial.print(vertical);
+  Serial.print("/");
+  Serial.print(holizonal);
+  Serial.print("/");
+  Serial.print(sub1);
+  Serial.print("/");
+  Serial.print(sub2);
+  Serial.println("/");
 }
