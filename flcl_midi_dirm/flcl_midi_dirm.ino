@@ -135,13 +135,13 @@ void checkFlick()
   holizonal = analogRead(JOY1B);
   sub1 = analogRead(JOY4A);
   sub2 = analogRead(JOY4B);
-  if (vertical < 500)
+  if (vertical < 1000)
   {
-    if (holizonal > 4000)
+    if (holizonal > 3600)
     {
       setFlick(UPLEFT);
     }
-    else if (holizonal < 500)
+    else if (holizonal < 1000)
     {
       setFlick(UPRIGHT);
     }
@@ -150,13 +150,13 @@ void checkFlick()
       setFlick(UP);
     }
   }
-  else if (vertical > 4000)
+  else if (vertical > 3600)
   {
-    if (holizonal > 4000)
+    if (holizonal > 3600)
     {
       setFlick(DOWNLEFT);
     }
-    else if (holizonal < 500)
+    else if (holizonal < 1000)
     {
       setFlick(DOWNRIGHT);
     }
@@ -165,13 +165,21 @@ void checkFlick()
       setFlick(DOWN);
     }
   }
-  else if (holizonal > 4000)
+  else if ((holizonal > 3600) && (vertical < 3000))
   {
     setFlick(LEFT);
   }
-  else if (holizonal < 500)
+  else if ((holizonal < 1000) && (vertical < 3000))
   {
     setFlick(RIGHT);
+  }
+  else if ((vertical < 1000) && (holizonal < 1000) && (sub1 < 2000) && (sub2 < 2000))
+  {
+    setFlick(RIGHTRORTATE);
+  }
+  else if ((vertical > 3600) && (holizonal > 3000) && (sub1 > 2000) && (sub2 > 2000))
+  {
+    setFlick(LEFTRORTATE);
   }
   else
   {
@@ -224,18 +232,22 @@ void setLed(byte mode)
     break;
   case UPLEFT:
     strip.setPixelColor(0, strip.Color(255, 0, 192));
+    strip.setPixelColor(2, strip.Color(255, 0, 192));
     strip.show();
     break;
   case UPRIGHT:
     strip.setPixelColor(0, strip.Color(255, 192, 0));
+    strip.setPixelColor(3, strip.Color(255, 192, 0));
     strip.show();
     break;
   case DOWNLEFT:
     strip.setPixelColor(0, strip.Color(0, 64, 255));
+    strip.setPixelColor(2, strip.Color(0, 64, 255));
     strip.show();
     break;
   case DOWNRIGHT:
     strip.setPixelColor(0, strip.Color(0, 255, 64));
+    strip.setPixelColor(3, strip.Color(0, 255, 64));
     strip.show();
     break;
   case LEFTRORTATE:
