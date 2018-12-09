@@ -130,10 +130,9 @@ bool checkSwitchChange()
   if (oldswitches[0] < curswitches[0])
   {
     oldstate = curstate;
-    curstate--;
-    if (curstate == -4)
+    if (curstate != 0)
     {
-      curstate = 0;
+      curstate--;
     }
     return true;
   }
@@ -141,7 +140,7 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate++;
-    if (curstate == 4)
+    if (curstate == 16)
     {
       curstate = 0;
     }
