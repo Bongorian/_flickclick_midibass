@@ -276,18 +276,26 @@ void setFlickLed(byte mode)
     break;
   case UP:
     strip.setPixelColor(0, strip.Color(255, 0, 0));
+    strip.setPixelColor(2, strip.Color(0, 0, 0));
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
     break;
   case DOWN:
     strip.setPixelColor(0, strip.Color(0, 255, 255));
+    strip.setPixelColor(2, strip.Color(0, 0, 0));
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
     break;
   case LEFT:
     strip.setPixelColor(0, strip.Color(128, 0, 255));
+    strip.setPixelColor(2, strip.Color(0, 0, 0));
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
     break;
   case RIGHT:
     strip.setPixelColor(0, strip.Color(128, 255, 0));
+    strip.setPixelColor(2, strip.Color(0, 0, 0));
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
     break;
   case UPLEFT:
@@ -419,14 +427,14 @@ void isFletactive(int shift)
     {
       if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] == 0))
       {
-        midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift + checkState(curstate), 127);
+        midi.sendNoteOn(curstate, notes[rowIndex][colIndex] + shift, 127);
       }
       else if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] != 0))
       {
       }
       else
       {
-        midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift + checkState(curstate), 127);
+        midi.sendNoteOff(curstate, notes[rowIndex][colIndex] + shift, 127);
       }
     }
   }
@@ -439,7 +447,7 @@ void AlloldNoteOff(byte mode, byte state)
   {
     for (int colIndex = 0; colIndex < colCount; colIndex++)
     {
-      midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift + checkState(state), 127);
+      midi.sendNoteOff(state, notes[rowIndex][colIndex] + oldshift, 127);
     }
   }
 }
