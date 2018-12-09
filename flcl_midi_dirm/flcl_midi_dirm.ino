@@ -49,8 +49,8 @@ byte oldmode;
 unsigned int vertical, holizonal, sub1, sub2; //方向,ねじりの検出
 byte curswitches[2] = {0, 0};
 byte oldswitches[2] = {0, 0};
-byte curstate = 0;
-byte oldstate = 0;
+int curstate = 0;
+int oldstate = 0;
 //instances
 USBMIDI midi;
 WS2812B strip = WS2812B(NUM_LEDS);
@@ -131,17 +131,20 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate--;
+    if (curstate == -4)
+    {
+      curstate = 0;
+    }
     return true;
   }
   if (oldswitches[1] < curswitches[1])
   {
     oldstate = curstate;
     curstate++;
-    return true;
-  }
-  if ((curstate == 4) || (curstate == -4))
-  {
-    curstate = 0;
+    if (curstate == 4)
+    {
+      curstate = 0;
+    }
     return true;
   }
   return false;
@@ -160,31 +163,31 @@ int checkState(byte state)
   switch (state)
   {
   case -3:
-    strip.setPixelColor(3, strip.Color(255, 255, 0));
+    strip.setPixelColor(1, strip.Color(255, 255, 0));
     strip.show();
     break;
   case -2:
-    strip.setPixelColor(3, strip.Color(0, 255, 255));
+    strip.setPixelColor(1, strip.Color(0, 255, 255));
     strip.show();
     break;
   case -1:
-    strip.setPixelColor(3, strip.Color(255, 0, 255));
+    strip.setPixelColor(1, strip.Color(255, 0, 255));
     strip.show();
     break;
   case 0:
-    strip.setPixelColor(3, strip.Color(0, 0, 0));
+    strip.setPixelColor(1, strip.Color(0, 0, 0));
     strip.show();
     break;
   case 1:
-    strip.setPixelColor(3, strip.Color(0, 0, 255));
+    strip.setPixelColor(1, strip.Color(0, 0, 255));
     strip.show();
     break;
   case 2:
-    strip.setPixelColor(3, strip.Color(0, 255, 0));
+    strip.setPixelColor(1, strip.Color(0, 255, 0));
     strip.show();
     break;
   case 3:
-    strip.setPixelColor(3, strip.Color(255, 0, 0));
+    strip.setPixelColor(1, strip.Color(255, 0, 0));
     strip.show();
     break;
   }
@@ -274,7 +277,6 @@ void setFlickLed(byte mode)
   {
   case MU:
     strip.setPixelColor(0, strip.Color(0, 0, 0));
-    strip.setPixelColor(1, strip.Color(0, 0, 0));
     strip.setPixelColor(2, strip.Color(0, 0, 0));
     strip.setPixelColor(3, strip.Color(0, 0, 0));
     strip.show();
