@@ -131,7 +131,11 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate--;
+<<<<<<< HEAD
     if (curstate == -4)
+=======
+    if (curstate == -5)
+>>>>>>> 7c80ed23c5c20cb8afc99146443f31bea538eccf
     {
       curstate = 0;
     }
@@ -141,7 +145,11 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate++;
+<<<<<<< HEAD
     if (curstate == 4)
+=======
+    if (curstate == 5)
+>>>>>>> 7c80ed23c5c20cb8afc99146443f31bea538eccf
     {
       curstate = 0;
     }
