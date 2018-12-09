@@ -140,7 +140,7 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate++;
-    if (curstate == 16)
+    if (curstate == 4)
     {
       curstate = 0;
     }
@@ -161,15 +161,6 @@ int checkState(int state)
 {
   switch (state)
   {
-  case -3:
-    strip.setPixelColor(1, strip.Color(32, 32, 0));
-    break;
-  case -2:
-    strip.setPixelColor(1, strip.Color(0, 32, 32));
-    break;
-  case -1:
-    strip.setPixelColor(1, strip.Color(32, 0, 32));
-    break;
   case 0:
     strip.setPixelColor(1, strip.Color(0, 0, 0));
     break;
