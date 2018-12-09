@@ -49,8 +49,8 @@ byte oldmode;
 unsigned int vertical, holizonal, sub1, sub2; //方向,ねじりの検出
 byte curswitches[2] = {0, 0};
 byte oldswitches[2] = {0, 0};
-byte curstate[2] = {0, 0};
-byte oldstate[2] = {0, 0};
+byte curstate = 0;
+byte oldstate = 0;
 //instances
 USBMIDI midi;
 WS2812B strip = WS2812B(NUM_LEDS);
@@ -125,6 +125,28 @@ uint32_t Wheel(byte WheelPos)
   }
 }
 
+bool checkSwitchChange()
+{
+  if (oldswitches[0] < curswitches[0])
+  {
+    oldstate = curstate;
+    curstate--;
+    return true;
+  }
+  if (oldswitches[1] < curswitches[1])
+  {
+    oldstate = curstate;
+    curstate++;
+    return true;
+  }
+  if ((curstate == 4) || (curstate == -4))
+  {
+    curstate = 0;
+    return true;
+  }
+  return false;
+}
+
 void checkSwitch()
 {
   oldswitches[0] = curswitches[0];
@@ -133,17 +155,40 @@ void checkSwitch()
   curswitches[1] = digitalRead(MODE2);
 }
 
-void checkSwitchChange(byte i)
+int checkState(byte state)
 {
-  if (oldswitches[i] < curswitches[i])
+  switch (state)
   {
-    oldstate[i] = curstate[i];
-    curstate[i]++;
+  case -3:
+    strip.setPixelColor(3, strip.Color(255, 255, 0));
+    strip.show();
+    break;
+  case -2:
+    strip.setPixelColor(3, strip.Color(0, 255, 255));
+    strip.show();
+    break;
+  case -1:
+    strip.setPixelColor(3, strip.Color(255, 0, 255));
+    strip.show();
+    break;
+  case 0:
+    strip.setPixelColor(3, strip.Color(0, 0, 0));
+    strip.show();
+    break;
+  case 1:
+    strip.setPixelColor(3, strip.Color(0, 0, 255));
+    strip.show();
+    break;
+  case 2:
+    strip.setPixelColor(3, strip.Color(0, 255, 0));
+    strip.show();
+    break;
+  case 3:
+    strip.setPixelColor(3, strip.Color(255, 0, 0));
+    strip.show();
+    break;
   }
-  if (curstate[i] == 4)
-  {
-    curstate[i] = 0;
-  }
+  return state;
 }
 
 void checkFlick()
@@ -208,7 +253,7 @@ void setFlick(byte status)
 {
   oldmode = curmode;
   curmode = status;
-  setLed(curmode);
+  setFlickLed(curmode);
 }
 
 bool checkFlickchange()
@@ -223,7 +268,7 @@ bool checkFlickchange()
   }
 }
 
-void setLed(byte mode)
+void setFlickLed(byte mode)
 {
   switch (mode)
   {
@@ -271,15 +316,15 @@ void setLed(byte mode)
     strip.show();
     break;
   case LEFTRORTATE:
-    strip.setPixelColor(0, strip.Color(0, 150, 0));
-    strip.setPixelColor(0, strip.Color(1, 150, 0));
-    strip.setPixelColor(0, strip.Color(2, 150, 0));
+    strip.setPixelColor(0, strip.Color(128, 0, 255));
+    strip.setPixelColor(2, strip.Color(128, 0, 255));
+    strip.setPixelColor(3, strip.Color(128, 0, 255));
     strip.show();
     break;
   case RIGHTRORTATE:
-    strip.setPixelColor(0, strip.Color(0, 150, 0));
-    strip.setPixelColor(0, strip.Color(1, 150, 0));
-    strip.setPixelColor(0, strip.Color(2, 150, 0));
+    strip.setPixelColor(0, strip.Color(128, 255, 0));
+    strip.setPixelColor(2, strip.Color(128, 255, 0));
+    strip.setPixelColor(3, strip.Color(128, 255, 0));
     strip.show();
     break;
   }
@@ -379,38 +424,39 @@ void isFletactive(int shift)
     {
       if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] == 0))
       {
-        midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift, 127);
+        midi.sendNoteOn(0, notes[rowIndex][colIndex] + shift + checkState(curstate), 127);
       }
       else if ((curkeys[rowIndex][colIndex] == 1) && (islongpresskeys[rowIndex][colIndex] != 0))
       {
       }
       else
       {
-        midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift, 127);
+        midi.sendNoteOff(0, notes[rowIndex][colIndex] + shift + checkState(curstate), 127);
       }
     }
   }
 }
 
-void AlloldNoteOff(byte mode)
+void AlloldNoteOff(byte mode, byte state)
 {
   int oldshift = shiftNote(mode);
   for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
   {
     for (int colIndex = 0; colIndex < colCount; colIndex++)
     {
-      midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
+      midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift + checkState(state), 127);
     }
   }
 }
 
 void loop()
 {
+  checkSwitch();
   checkFlick();
   readMatrix();
-  if (checkFlickchange())
+  if (checkFlickchange() || checkSwitchChange())
   {
-    AlloldNoteOff(oldmode);
+    AlloldNoteOff(oldmode, oldstate);
   }
   setNote(curmode);
 }
