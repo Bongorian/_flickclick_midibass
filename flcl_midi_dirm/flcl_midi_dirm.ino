@@ -49,6 +49,8 @@ byte oldmode;
 unsigned int vertical, holizonal, sub1, sub2; //方向,ねじりの検出
 byte curswitches[2] = {0, 0};
 byte oldswitches[2] = {0, 0};
+byte curstate[2] = {0, 0};
+byte oldstate[2] = {0, 0};
 //instances
 USBMIDI midi;
 WS2812B strip = WS2812B(NUM_LEDS);
@@ -56,7 +58,6 @@ WS2812B strip = WS2812B(NUM_LEDS);
 void setup()
 {
   Serial.begin(115200);
-  Serial1.begin(115200);
   for (int x = 0; x < rowCount; x++)
   {
     pinMode(rows[x], OUTPUT);
@@ -130,6 +131,19 @@ void checkSwitch()
   oldswitches[1] = curswitches[1];
   curswitches[0] = digitalRead(MODE1);
   curswitches[1] = digitalRead(MODE2);
+}
+
+void checkSwitchChange(byte i)
+{
+  if (oldswitches[i] < curswitches[i])
+  {
+    oldstate[i] = curstate[i];
+    curstate[i]++;
+  }
+  if (curstate[i] == 4)
+  {
+    curstate[i] = 0;
+  }
 }
 
 void checkFlick()
@@ -314,26 +328,47 @@ void printMatrix()
   Serial.println("");
 }
 
-void setNote(byte mode)
+int shiftNote(byte mode)
 {
-  int shift = mode * 8 - 28;
+  int shift;
   switch (mode)
   {
-  case LEFT:
-    isFletactive(shift);
-    break;
-  case RIGHT:
-    isFletactive(shift);
-    break;
   case UP:
-    isFletactive(shift + 12);
+    shift = 12;
     break;
   case DOWN:
-    isFletactive(shift - 12);
+    shift = -12;
+    break;
+  case LEFT:
+    shift = -4;
+    break;
+  case RIGHT:
+    shift = 4;
+    break;
+  case UPLEFT:
+    shift = 8;
+    break;
+  case UPRIGHT:
+    shift = 20;
+    break;
+  case DOWNLEFT:
+    shift = -16;
+    break;
+  case DOWNRIGHT:
+    shift = -8;
     break;
   case MU:
-    isFletactive(0);
+  case LEFTRORTATE:
+  case RIGHTRORTATE:
+    shift = 0;
+    break;
   }
+  return shift;
+}
+
+void setNote(byte mode)
+{
+  isFletactive(shiftNote(mode));
 }
 
 void isFletactive(int shift)
@@ -359,35 +394,14 @@ void isFletactive(int shift)
 
 void AlloldNoteOff(byte mode)
 {
-  int oldshift = mode * 8 - 28;
-  if (mode == MU)
+  int oldshift = shiftNote(mode);
+  for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
   {
-    oldshift = 0;
-  }
-  if (mode == UP)
-  {
-    oldshift = 12;
-  }
-  if (mode == DOWN)
-  {
-    oldshift = -12;
-  }
-  if (mode == UPLEFT)
-  {
-    oldshift = 8;
-  }
-  if (mode == UP)
-  {
-    oldshift = 8;
-  }
-  else if (mode)
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+    for (int colIndex = 0; colIndex < colCount; colIndex++)
     {
-      for (int colIndex = 0; colIndex < colCount; colIndex++)
-      {
-        midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
-      }
+      midi.sendNoteOff(0, notes[rowIndex][colIndex] + oldshift, 127);
     }
+  }
 }
 
 void loop()
@@ -399,12 +413,4 @@ void loop()
     AlloldNoteOff(oldmode);
   }
   setNote(curmode);
-  Serial.print(vertical);
-  Serial.print("/");
-  Serial.print(holizonal);
-  Serial.print("/");
-  Serial.print(sub1);
-  Serial.print("/");
-  Serial.print(sub2);
-  Serial.println("/");
 }
