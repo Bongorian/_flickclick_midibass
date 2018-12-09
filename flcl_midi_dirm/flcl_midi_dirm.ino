@@ -81,12 +81,12 @@ void setup()
   //led init
   strip.begin();
   strip.show();
-  rainbowCycle(10);
+  rainbowCycle(5);
   strip.setPixelColor(0, strip.Color(0, 0, 0));
   strip.setPixelColor(1, strip.Color(0, 0, 0));
   strip.setPixelColor(2, strip.Color(0, 0, 0));
   strip.setPixelColor(3, strip.Color(0, 0, 0));
-  delay(1000);
+  delay(200);
 }
 
 void rainbowCycle(uint8_t wait)
@@ -131,11 +131,7 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate--;
-<<<<<<< HEAD
     if (curstate == -4)
-=======
-    if (curstate == -5)
->>>>>>> 7c80ed23c5c20cb8afc99146443f31bea538eccf
     {
       curstate = 0;
     }
@@ -145,11 +141,7 @@ bool checkSwitchChange()
   {
     oldstate = curstate;
     curstate++;
-<<<<<<< HEAD
     if (curstate == 4)
-=======
-    if (curstate == 5)
->>>>>>> 7c80ed23c5c20cb8afc99146443f31bea538eccf
     {
       curstate = 0;
     }
@@ -172,31 +164,24 @@ int checkState(byte state)
   {
   case -3:
     strip.setPixelColor(1, strip.Color(255, 255, 0));
-    strip.show();
     break;
   case -2:
     strip.setPixelColor(1, strip.Color(0, 255, 255));
-    strip.show();
     break;
   case -1:
     strip.setPixelColor(1, strip.Color(255, 0, 255));
-    strip.show();
     break;
   case 0:
     strip.setPixelColor(1, strip.Color(0, 0, 0));
-    strip.show();
     break;
   case 1:
     strip.setPixelColor(1, strip.Color(0, 0, 255));
-    strip.show();
     break;
   case 2:
     strip.setPixelColor(1, strip.Color(0, 255, 0));
-    strip.show();
     break;
   case 3:
     strip.setPixelColor(1, strip.Color(255, 0, 0));
-    strip.show();
     break;
   }
   return state;
