@@ -158,30 +158,30 @@ void checkSwitch()
   curswitches[1] = digitalRead(MODE2);
 }
 
-int checkState(byte state)
+int checkState(int state)
 {
   switch (state)
   {
   case -3:
-    strip.setPixelColor(1, strip.Color(255, 255, 0));
+    strip.setPixelColor(1, strip.Color(32, 32, 0));
     break;
   case -2:
-    strip.setPixelColor(1, strip.Color(0, 255, 255));
+    strip.setPixelColor(1, strip.Color(0, 32, 32));
     break;
   case -1:
-    strip.setPixelColor(1, strip.Color(255, 0, 255));
+    strip.setPixelColor(1, strip.Color(32, 0, 32));
     break;
   case 0:
     strip.setPixelColor(1, strip.Color(0, 0, 0));
     break;
   case 1:
-    strip.setPixelColor(1, strip.Color(0, 0, 255));
+    strip.setPixelColor(1, strip.Color(0, 0, 32));
     break;
   case 2:
-    strip.setPixelColor(1, strip.Color(0, 255, 0));
+    strip.setPixelColor(1, strip.Color(0, 32, 0));
     break;
   case 3:
-    strip.setPixelColor(1, strip.Color(255, 0, 0));
+    strip.setPixelColor(1, strip.Color(32, 0, 0));
     break;
   }
   return state;
